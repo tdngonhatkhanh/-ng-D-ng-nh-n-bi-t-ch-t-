@@ -8,7 +8,7 @@ const analysisSchema: Schema = {
   properties: {
     liquidName: {
       type: Type.STRING,
-      description: "Tên dự đoán của chất lỏng (Ví dụ: Nước cam, Axit Sulfuric, Nước tẩy).",
+      description: "Tên dự đoán của chất hoặc dung dịch trong hình (Ví dụ: Nước cam, Đất ẩm, Giấy quỳ tím, Axit Sulfuric).",
     },
     estimatedPH: {
       type: Type.NUMBER,
@@ -20,7 +20,7 @@ const analysisSchema: Schema = {
     },
     reasoning: {
       type: Type.STRING,
-      description: "Giải thích ngắn gọn tại sao đưa ra độ pH này dựa trên màu sắc, bọt, ngữ cảnh hình ảnh.",
+      description: "Giải thích ngắn gọn tại sao đưa ra độ pH này dựa trên hình ảnh.",
     },
     properties: {
       type: Type.ARRAY,
@@ -34,21 +34,16 @@ const analysisSchema: Schema = {
     commonUses: {
       type: Type.ARRAY,
       items: { type: Type.STRING },
-      description: "Các ứng dụng phổ biến của chất lỏng này.",
-    },
-    isLiquidDetected: {
-      type: Type.BOOLEAN,
-      description: "True nếu phát hiện chất lỏng trong hình, False nếu không.",
+      description: "Các ứng dụng phổ biến của chất này.",
     }
   },
-  required: ["liquidName", "estimatedPH", "reasoning", "isLiquidDetected", "properties", "safetyWarning", "commonUses"],
+  required: ["liquidName", "estimatedPH", "reasoning", "properties", "safetyWarning", "commonUses"],
 };
 
 export const analyzeLiquidImage = async (base64Image: string, mimeType: string = "image/jpeg"): Promise<LiquidAnalysis> => {
   try {
-    const prompt = `Bạn là một chuyên gia hóa học AI. Hãy phân tích hình ảnh này để xác định chất lỏng bên trong.
-    Dựa trên màu sắc, độ nhớt (nếu nhìn thấy), bọt khí, vật chứa (cốc thí nghiệm, chai nước ngọt, v.v.) và bối cảnh, hãy ước tính độ pH của nó.
-    Nếu hình ảnh không chứa chất lỏng rõ ràng, hãy đặt 'isLiquidDetected' là false.
+    const prompt = `Bạn là một chuyên gia hóa học AI. Hãy phân tích hình ảnh này để xác định chất hoặc vật thể liên quan đến hóa học bên trong.
+    Dựa trên màu sắc, bọt khí, vật chứa, giấy thử pH (nếu có) hoặc ngữ cảnh hình ảnh, hãy ước tính độ pH của nó.
     Trả lời hoàn toàn bằng Tiếng Việt.`;
 
     const response = await ai.models.generateContent({
@@ -69,8 +64,8 @@ export const analyzeLiquidImage = async (base64Image: string, mimeType: string =
       config: {
         responseMimeType: "application/json",
         responseSchema: analysisSchema,
-        systemInstruction: "Bạn là một trợ lý phòng thí nghiệm ảo chính xác và hữu ích.",
-        temperature: 0.4, // Lower temperature for more analytical results
+        systemInstruction: "Bạn là một trợ lý khoa học hữu ích. Bạn luôn cố gắng đưa ra ước tính tốt nhất dựa trên hình ảnh.",
+        temperature: 0.4,
       },
     });
 

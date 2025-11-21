@@ -13,7 +13,7 @@ function App() {
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [dragActive, setDragActive] = useState(false);
 
-  // Handle Paste (Snipping Tool)
+  // Xử lý Paste (Snipping Tool)
   useEffect(() => {
     const handlePaste = (e: ClipboardEvent) => {
       if (isAnalyzing) return;
@@ -47,7 +47,7 @@ function App() {
       const result = reader.result as string;
       setImageSrc(result);
       setImageBase64(result.split(',')[1]);
-      setResult(null);
+      setResult(null); // Reset kết quả cũ
       setError(null);
     };
     reader.readAsDataURL(file);
@@ -78,12 +78,14 @@ function App() {
     }
   };
 
+  // Xử lý ảnh chụp từ camera
   const handleCameraCapture = (base64: string) => {
     const fullSrc = `data:image/jpeg;base64,${base64}`;
     setImageSrc(fullSrc);
     setImageBase64(base64);
     setResult(null);
     setError(null);
+    // Không gọi startAnalysis() ở đây để người dùng tự nhấn nút phân tích
   };
 
   const startAnalysis = async () => {
@@ -133,7 +135,7 @@ function App() {
               Kiểm tra độ pH bằng AI
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Tải lên hình ảnh, dán từ clipboard (Ctrl+V) hoặc chụp ảnh chất lỏng để nhận phân tích độ pH, cảnh báo an toàn và tính chất hóa học.
+              Tải lên hình ảnh, dán từ clipboard (Ctrl+V) hoặc chụp ảnh để nhận phân tích độ pH, cảnh báo an toàn và tính chất hóa học.
             </p>
           </div>
         )}
@@ -218,13 +220,16 @@ function App() {
                             onClick={resetApp}
                             className="flex-1 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:text-slate-900 transition shadow-sm"
                         >
-                            Chọn ảnh khác
+                            Chụp/Chọn lại
                         </button>
                         {!result && !isAnalyzing && (
                              <button 
                              onClick={startAnalysis}
-                             className="flex-1 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition shadow-md shadow-blue-200"
+                             className="flex-1 py-2.5 text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition shadow-md shadow-blue-200 flex items-center justify-center gap-2"
                          >
+                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+                             </svg>
                              Phân tích ngay
                          </button>
                         )}
@@ -237,7 +242,7 @@ function App() {
                         <div className="flex flex-col items-center justify-center h-full min-h-[300px] bg-white rounded-2xl border border-slate-100 shadow-sm p-8 animate-pulse">
                             <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-6"></div>
                             <h3 className="text-xl font-semibold text-slate-800 mb-2">Đang phân tích...</h3>
-                            <p className="text-slate-500 text-center">AI đang xác định tính chất hóa học và độ pH của chất lỏng.</p>
+                            <p className="text-slate-500 text-center">AI đang xác định tính chất hóa học và độ pH.</p>
                         </div>
                     )}
 
@@ -276,19 +281,6 @@ function App() {
                                 </div>
 
                                 <div className="p-6">
-                                    {/* Is Liquid Check */}
-                                    {!result.isLiquidDetected && (
-                                         <div className="mb-6 p-4 bg-orange-50 border border-orange-200 text-orange-800 rounded-xl flex items-start gap-3">
-                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 shrink-0 mt-0.5">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.008v.008h-.008v-.008z" />
-                                             </svg>
-                                             <div>
-                                                <p className="font-bold">Cảnh báo</p>
-                                                <p className="text-sm mt-1">AI không phát hiện thấy chất lỏng rõ ràng trong hình ảnh này. Kết quả bên dưới có thể không chính xác.</p>
-                                             </div>
-                                         </div>
-                                    )}
-
                                     <h3 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
                                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />

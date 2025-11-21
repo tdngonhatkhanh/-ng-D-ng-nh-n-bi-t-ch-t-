@@ -6,7 +6,6 @@ export interface LiquidAnalysis {
   properties: string[];
   safetyWarning: string;
   commonUses: string[];
-  isLiquidDetected: boolean;
 }
 
 export interface AnalysisError {
