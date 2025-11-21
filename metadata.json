@@ -1,0 +1,7 @@
+{
+  "name": "pH Vision Analyzer",
+  "description": "Phân tích độ pH của chất lỏng qua hình ảnh sử dụng AI",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
